@@ -2,12 +2,12 @@
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 import java.util.Scanner;
 class SLLNode<E> {
-    E data;         // The data element of the node
-    SLLNode<E> next; // The reference to the next node in the list
+    E data;         
+    SLLNode<E> next;
 
     public SLLNode(E data) {
         this.data = data;
-        this.next = null; // Initialize next to null
+        this.next = null; 
     }
 }
 class SLL<E>{
