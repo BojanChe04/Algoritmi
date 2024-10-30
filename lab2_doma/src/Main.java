@@ -1,246 +1,208 @@
-//
-//import java.util.Scanner;
-//class DLLNode {
-//    int data;
-//    DLLNode next;
-//    DLLNode prev;
-//
-//    public DLLNode(int data) {
-//        this.data = data;
-//        this.next = null;
-//        this.prev = null;
-//    }
-//}
-//class DLL{
-//    DLLNode head;
-//    public DLL() {
-//        this.head = null;
-//    }
-//    public void addElement(int data){
-//        DLLNode newNode = new DLLNode(data);
-//        if(head == null){
-//            head = newNode;
-//            return;
-//        }
-//        DLLNode current = head;
-//        while(current.next != null){
-//            current = current.next;
-//        }
-//        current.next = newNode;
-//        newNode.prev = current;
-//    }
-//    public DLLNode getLast() {
-//        if (head == null) {
-//            return null;
-//        }
-//        DLLNode current = head;
-//        while (current.next != null) {
-//            current = current.next;
-//        }
-//        return current;
-//    }
-////    public int prosek_from(DLLNode node){
-////        if(node == null){
-////            return 0;
-////        }
-////        int sum = 0;
-////        int brojac=0;
-////        DLLNode current = node.next;
-////        while(current != null){
-////            sum += current.data;
-////            brojac++;
-////            current = current.next;
-////        }
-////        if(brojac == 0){
-////            return 0;
-////        }
-////        else{
-////            return sum/brojac;
-////        }
-////    }
-////    public int prosek_to(DLLNode node){
-////        if(node == null){
-////            return 0;
-////        }
-////        int sum = 0;
-////        int brojac=0;
-////        DLLNode current = head;
-////        while(current != node){
-////            sum += current.data;
-////            brojac++;
-////            current = current.next;
-////        }
-////        if(brojac == 0){
-////            return 0;
-////        }
-////        else{
-////            return sum/brojac;
-////        }
-////    }
-//    public int funkcija(){
-//        int brojac = -1;
-//        DLLNode current = head;
-//        while(current != null){
-//            int before_SUM = 0;
-//            int before_Brojac = 0;
-//            DLLNode pred = current.prev;
-//            while(pred != null){
-//                before_SUM += pred.data;
-//                before_Brojac++;
-//                pred = pred.prev;
-//            }
-//            double predProsek;
-//            if (before_Brojac > 0) {
-//                predProsek = (double) before_SUM / before_Brojac;
-//            } else {
-//                predProsek = 0;
-//            }
-//            int posle_sum= 0;
-//            int posle_brojac=0;
-//            DLLNode posle = current.next;
-//            while(posle != null){
-//                posle_sum += posle.data;
-//                posle_brojac++;
-//                posle = posle.next;
-//            }
-//            double posleProsek;
-//            if (before_Brojac > 0) {
-//                posleProsek = (double) posle_sum / posle_brojac;
-//            } else {
-//                posleProsek = 0;
-//            }
-//            if (predProsek > posleProsek) {
-//                brojac++;
-//            }
-//            current=current.next;
-//        }
-//        return brojac;
-//    }
-//    public void printList(){
-//        DLLNode current = head;
-//        while(current!=null){
-//            System.out.print(current.data+" ");
-//            current = current.next;
-//        }
-//        System.out.println();
-//    }
-//
-//}
-//public class Main {
-//    public static void main(String[] args) {
-//        Scanner sc = new Scanner(System.in);
-//        DLL lista = new DLL();
-//        int n = sc.nextInt();
-//        for(int i = 0; i < n; i++){
-//            lista.addElement(sc.nextInt());
-//        }
-//        int rezultat = lista.funkcija();
-//        System.out.println(rezultat);
-//    }
-//}
-//
+
+import java.sql.ClientInfoStatus;
 import java.util.Scanner;
 
-class DLLNode {
-    int data;
-    DLLNode next;
-    DLLNode prev;
+ class DLLNode<E> {
+    protected E element;
+    protected DLLNode<E> pred, succ;
+    public DLLNode(E elem, DLLNode<E> pred, DLLNode<E> succ) {
+        this.element = elem;
+        this.pred = pred;
+        this.succ = succ;
+    }
 
-    public DLLNode(int data) {
-        this.data = data;
-        this.next = null;
-        this.prev = null;
+    @Override
+    public String toString() {
+        return element.toString();
     }
 }
-
-class DLL {
-    DLLNode head;
+class DLL<E> {
+    private DLLNode<E> first, last;
 
     public DLL() {
-        this.head = null;
+        // Construct an empty SLL
+        this.first = null;
+        this.last = null;
     }
 
-    public void addElement(int data) {
-        DLLNode newNode = new DLLNode(data);
-        if (head == null) {
-            head = newNode;
+    public void insertFirst(E o) {
+        DLLNode<E> ins = new DLLNode<E>(o, null, first);
+        if (first == null)
+            last = ins;
+        else
+            first.pred = ins;
+        first = ins;
+    }
+
+    public void insertLast(E o) {
+        if (first == null)
+            insertFirst(o);
+        else {
+            DLLNode<E> ins = new DLLNode<E>(o, last, null);
+            last.succ = ins;
+            last = ins;
+        }
+    }
+
+    public void insertAfter(E o, DLLNode<E> after) {
+        if (after == last) {
+            insertLast(o);
             return;
         }
-        DLLNode current = head;
-        while (current.next != null) {
-            current = current.next;
-        }
-        current.next = newNode;
-        newNode.prev = current;
+        DLLNode<E> ins = new DLLNode<E>(o, after, after.succ);
+        after.succ.pred = ins;
+        after.succ = ins;
     }
 
-    public int calculateAverage() {
-        int count = -1;
-        DLLNode current = head;
+    public void insertBefore(E o, DLLNode<E> before) {
+        if (before == first) {
+            insertFirst(o);
+            return;
+        }
+        DLLNode<E> ins = new DLLNode<E>(o, before.pred, before);
+        before.pred.succ = ins;
+        before.pred = ins;
+    }
 
-        while (current != null) {
-            int beforeSum = 0;
-            int beforeCount = 0;
-            DLLNode pred = current.prev;
-            while (pred != null) {
-                beforeSum += pred.data;
-                beforeCount++;
-                pred = pred.prev;
+    public E deleteFirst() {
+        if (first != null) {
+            DLLNode<E> tmp = first;
+            first = first.succ;
+            if (first != null) first.pred = null;
+            if (first == null)
+                last = null;
+            return tmp.element;
+        } else
+            return null;
+    }
+
+    public E deleteLast() {
+        if (first != null) {
+            if (first.succ == null)
+                return deleteFirst();
+            else {
+                DLLNode<E> tmp = last;
+                last = last.pred;
+                last.succ = null;
+                return tmp.element;
             }
+        } else
+            return null;
+    }
 
-            double predAverage;
-            if (beforeCount > 0) {
-                predAverage = (double) beforeSum / beforeCount;
+    public E delete(DLLNode<E> node) {
+        if (node == first) {
+            return deleteFirst();
+        }
+        if (node == last) {
+            return deleteLast();
+        }
+        node.pred.succ = node.succ;
+        node.succ.pred = node.pred;
+        return node.element;
+
+    }
+
+    public DLLNode<E> find(E o) {
+        if (first != null) {
+            DLLNode<E> tmp = first;
+            while (!tmp.element.equals(o) && tmp.succ != null)
+                tmp = tmp.succ;
+            if (tmp.element.equals(o)) {
+                return tmp;
             } else {
-                predAverage = 0;
+                System.out.println("Elementot ne postoi vo listata");
             }
-
-            int afterSum = 0;
-            int afterCount = 0;
-            DLLNode after = current.next;
-            while (after != null) {
-                afterSum += after.data;
-                afterCount++;
-                after = after.next;
-            }
-
-            double afterAverage;
-            if (afterCount > 0) {
-                afterAverage = (double) afterSum / afterCount;
-            } else {
-                afterAverage = 0;
-            }
-
-            if (predAverage > afterAverage) {
-                count++;
-            }
-
-            current = current.next;
+        } else {
+            System.out.println("Listata e prazna");
         }
-
-        return count;
+        return null;
     }
 
-    public void printList() {
-        DLLNode current = head;
-        while (current != null) {
-            System.out.print(current.data + " ");
-            current = current.next;
-        }
-        System.out.println();
+    public void deleteList() {
+        first = null;
+        last = null;
     }
+
+    public int getSize() {
+        int listSize = 0;
+        DLLNode<E> tmp = first;
+        while(tmp != null) {
+            listSize++;
+            tmp = tmp.succ;
+        }
+        return listSize;
+    }
+
+    @Override
+    public String toString() {
+        String ret = new String();
+        if (first != null) {
+            DLLNode<E> tmp = first;
+            ret += tmp.toString();
+            while (tmp.succ != null) {
+                tmp = tmp.succ;
+                ret += "<->" + tmp.toString();
+            }
+        } else
+            ret = "Prazna lista!!!";
+        return ret;
+    }
+
+    public String toStringR() {
+        String ret = new String();
+        if (last != null) {
+            DLLNode<E> tmp = last;
+            ret += tmp.toString();
+            while (tmp.pred != null) {
+                tmp = tmp.pred;
+                ret += "<->" + tmp.toString();
+            }
+        } else
+            ret = "Prazna lista!!!";
+        return ret;
+    }
+
+    public DLLNode<E> getFirst() {
+        return first;
+    }
+
+    public DLLNode<E> getLast() {
+
+        return last;
+    }
+
 }
-
 public class Main {
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
-        DLL list = new DLL();
+        DLL list = new DLL<>();
         int n = sc.nextInt();
         for (int i = 0; i < n; i++) {
-            list.addElement(sc.nextInt());
+            list.insertLast(sc.nextInt());
         }
-        int result = list.calculateAverage();
-        System.out.println(result);
-        sc.close();
+        int m = sc.nextInt();
+        int k = sc.nextInt();
+        DLLNode target = list.find(m);
+        DLLNode current = list.getFirst();
+//        while (current != null) {
+//            DLLNode nextNode = current.succ;
+//            if(current.element.equals(target.element)) {
+//                list.delete(current);
+//            }
+//            current = nextNode;
+//        }
+        DLLNode curr = target;
+        for (int i = 0; i < k; i++) {
+            if(curr.succ != null) {
+                curr = curr.succ;
+            }
+            else{
+                curr = list.getFirst();
+            }
+        }
+        list.delete(target);
+        list.insertAfter(target.element, curr);
+        System.out.println(list.toString());
     }
 }
