@@ -1,0 +1,81 @@
+class unionFind{
+     private int[] parent, rank;
+     public unionFind(int n){
+         parent = new int[n];
+         rank = new int[n];
+         for(int i = 0; i < n; i++){
+             parent[i] = i;
+             rank[i] = 0;
+         }
+     }
+     public int find(int x){
+         if(parent[x] != x){
+             parent[x] = find(parent[x]);
+         }
+         return parent[x];
+     }
+     public boolean union(int x, int y){
+         int rootX  = find(x);
+         int rootY  = find(y);
+
+         if(rootX == rootY){
+             return false;
+         }
+
+         if(rank[rootX] > rank[rootY]){
+             parent[rootY] = rootX;
+         } else if (rank[rootX] < rank[rootY]) {
+             parent[rootX] = rootY;
+         }
+         else{
+             parent[rootY] = rootX;
+             rank[rootX]++;
+         }
+         return true;
+     }
+
+}
+////////////////////////////////////////////////////
+ public static int getMSTCost(AdjacencyListGraph<String> graph, String[] cities){
+        List<Edge> edges = new ArrayList<>();
+        for(String city: cities){
+            for(Map.Entry<String, Integer> neighbor : graph.getNeighbors(city).entrySet()){
+                edges.add(new Edge(city, neighbor.getKey(), neighbor.getValue()));
+            }
+        }
+        edges.sort(Comparator.comparingInt(edge -> edge.weight));
+        unionFind uf = new unionFind(edges.size());
+        Map<String, Integer> cityToindex = new HashMap<>();
+        for(int i = 0; i < cities.length; i++){
+            cityToindex.put(cities[i], i);
+        }
+
+        int totalCost = 0;
+        int edgeUsed = 0;
+
+        for(Edge edge: edges){
+            int city1 = cityToindex.get(edge.source);
+            int city2 = cityToindex.get(edge.destination);
+
+            if(uf.union(city1, city2)){
+                totalCost += edge.weight;
+                edgeUsed++;
+
+                if(edgeUsed == cities.length - 1){
+                    break;
+                }
+            }
+        }
+        return totalCost;
+    }
+////////////////////////////////////////////////////////////////////////
+class Edge{
+     String source;
+     String destination;
+     int weight;
+     public Edge(String source, String destination, int weight) {
+         this.source = source;
+         this.destination = destination;
+         this.weight = weight;
+     }
+}
