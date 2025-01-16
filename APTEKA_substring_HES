@@ -1,0 +1,253 @@
+
+import java.util.*;
+import java.util.Iterator;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.text.DecimalFormat;
+
+
+ class MapEntry<K extends Comparable<K>, E> {
+    // Each MapEntry object is a pair consisting of a key (a Comparable object)
+    // and a value (an arbitrary object).
+    K key;
+    E value;
+
+    public MapEntry(K key, E val) {
+        this.key = key;
+        this.value = val;
+    }
+
+    public String toString() {
+        return "<" + key + "," + value + ">";
+    }
+}
+
+ class SLLNode<E> {
+    protected E element;
+    protected SLLNode<E> succ;
+
+    public SLLNode(E elem, SLLNode<E> succ) {
+        this.element = elem;
+        this.succ = succ;
+    }
+
+    @Override
+    public String toString() {
+        return element.toString();
+    }
+}
+
+
+class CBHT<K extends Comparable<K>, E> {
+
+    // An object of class CBHT is a closed-bucket hash table, containing
+    // entries of class MapEntry.
+    private SLLNode<MapEntry<K, E>>[] buckets;
+
+    @SuppressWarnings("unchecked")
+    public CBHT(int m) {
+        // Construct an empty CBHT with m buckets.
+        buckets = (SLLNode<MapEntry<K, E>>[]) new SLLNode[m];
+    }
+
+    private int hash(K key) {
+        // Translate key to an index of the array buckets.
+        return Math.abs(key.hashCode()) % buckets.length;
+    }
+
+    public SLLNode<MapEntry<K, E>> search(K targetKey) {
+        // Find which if any node of this CBHT contains an entry whose key is equal to targetKey.
+        // Return a link to that node (or null if there is none).
+        int b = hash(targetKey);
+        SLLNode<MapEntry<K, E>> currNode = buckets[b];
+        while (currNode != null) {
+            MapEntry<K, E> currEntry = currNode.element;
+            if (currEntry.key.equals(targetKey)) return currNode;
+            else currNode = currNode.succ;
+        }
+        return null;
+    }
+
+    public void insert(K key, E val) {
+        // Insert the entry <key, val> into this CBHT.
+        // If entry with same key exists, overwrite it.
+        MapEntry<K, E> newEntry = new MapEntry<>(key, val);
+        int b = hash(key);
+        SLLNode<MapEntry<K, E>> currNode = buckets[b];
+        while (currNode != null) {
+            MapEntry<K, E> currEntry = currNode.element;
+            if (currEntry.key.equals(key)) {
+                // Make newEntry replace the existing entry ...
+                currNode.element = newEntry;
+                return;
+            } else currNode = currNode.succ;
+        }
+        // Insert newEntry at the front of the SLL in bucket b ...
+        buckets[b] = new SLLNode<>(newEntry, buckets[b]);
+    }
+
+    public void delete(K key) {
+        // Delete the entry (if any) whose key is equal to key from this CBHT.
+        int b = hash(key);
+        SLLNode<MapEntry<K, E>> predNode = null, currNode = buckets[b];
+        while (currNode != null) {
+            MapEntry<K, E> currEntry = currNode.element;
+            if (currEntry.key.equals(key)) {
+                if (predNode == null) buckets[b] = currNode.succ;
+                else predNode.succ = currNode.succ;
+                return;
+            } else {
+                predNode = currNode;
+                currNode = currNode.succ;
+            }
+        }
+    }
+
+    public String toString() {
+        String temp = "";
+        for (int i = 0; i < buckets.length; i++) {
+            temp += i + ":";
+            SLLNode<MapEntry<K, E>> curr = buckets[i];
+            while (curr != null) {
+                temp += curr.element.toString() + " ";
+                curr = curr.succ;
+            }
+            temp += "\n";
+        }
+        return temp;
+    }
+}
+
+class Lek{
+     String ime;
+     int dostapen;
+     int cena;
+     int broj_lekovi;
+     Lek(String ime, int dostapen, int cena, int broj_lekovi) {
+         this.ime = ime;
+         this.dostapen = dostapen;
+         this.cena = cena;
+         this.broj_lekovi = broj_lekovi;
+     }
+
+    public String getIme() {
+        return ime;
+    }
+
+    public void setIme(String ime) {
+        this.ime = ime;
+    }
+
+    public int getDostapen() {
+        return dostapen;
+    }
+
+    public void setDostapen(int dostapen) {
+        this.dostapen = dostapen;
+    }
+
+    public int getCena() {
+        return cena;
+    }
+
+    public void setCena(int cena) {
+        this.cena = cena;
+    }
+
+    public int getBroj_lekovi() {
+        return broj_lekovi;
+    }
+
+    public void setBroj_lekovi(int broj_lekovi) {
+        this.broj_lekovi = broj_lekovi;
+    }
+    @Override
+    public String toString() {
+        return ime+"\n"+(dostapen==0?"NEG":"POZ")+"\n"+cena+"\n"+broj_lekovi;
+    }
+}
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Scanner sc = new Scanner(System.in);
+        int n = sc.nextInt();
+        sc.nextLine();
+        CBHT<String, List<Lek>> mapa = new CBHT<>(2*n);
+
+        for (int i = 0; i < n; i++){
+            String line = sc.nextLine();
+            String[] parts = line.split(" ");
+            String ime = parts[0];
+            int dostapen = Integer.parseInt(parts[1]);
+            int cena = Integer.parseInt(parts[2]);
+            int broj_lekovi = Integer.parseInt(parts[3]);
+            Lek lek = new Lek(ime.toUpperCase(), dostapen, cena, broj_lekovi);
+
+            SLLNode<MapEntry<String, List<Lek>>> entry = mapa.search(ime.substring(0,3).toUpperCase());
+            if (entry != null) {
+                List<Lek> lekoviList = entry.element.value;
+                lekoviList.add(lek);
+//                mapa.insert(ime.substring(0,3).toUpperCase(), lekoviList);
+            }
+            else{
+                List<Lek> lekoviList = new ArrayList<>();
+                lekoviList.add(lek);
+                mapa.insert(ime.substring(0,3).toUpperCase(), lekoviList);
+            }
+        }
+        while(true){
+            String line = sc.nextLine();
+            if(line.equals("KRAJ")){
+                break;
+            }
+            String[] parts = line.split(" ");
+            String ime = parts[0].toUpperCase();
+            SLLNode<MapEntry<String, List<Lek>>> entry = mapa.search(ime.substring(0,3));
+            if (entry == null) {
+                System.out.println("Takov lek NE POSTOI vo sistemot");
+            }
+            else{
+                boolean flag = false;
+
+                List<Lek> lekoviList = entry.element.value;
+                for(Lek lek : lekoviList){
+                    if(lek.getIme().equals(ime)){
+                        flag = true;
+                        if(lek.getDostapen()==0){
+                            System.out.println("Lekot ne e dostapen");
+                        }
+                        else {
+                            int broj = Integer.parseInt(parts[1]);
+                            if (broj > lek.getBroj_lekovi()) {
+                                System.out.println("NEma dovolno lekovi");
+                            } else {
+                                lek.setBroj_lekovi(lek.getBroj_lekovi() - broj);
+                                System.out.println("Napravena naracka!");
+                            }
+                        }
+                        break;
+                    }
+                }
+                if(!flag){
+                    System.out.println("Takov lek NE POSTOI vo sistemot");
+                }
+            }
+        }
+    }
+}
+
+
+//5
+//Aspirin 1 50 10
+//Paracetamol 1 30 5
+//Ibuprofen 0 70 7
+//Amoxicillin 1 100 15
+//CoughSyrup 0 40 20
+//Aspirin 5
+//Amoxicillin 10
+//Ibuprofen 3
+//Paracetamol 3
+//CoughSyrup 25
+//KRAJ
